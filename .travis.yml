@@ -15,9 +15,6 @@ script:
 - yarn lint
 - yarn test
 - yarn build
-after_success:
-- git push --dry-run https://${GH_TOKEN}@github.com/AlephSF/react-router-hijack-a HEAD:master
-- git push --dry-run https://${GH_TOKEN}@github.com/AlephSF/react-router-hijack-a.git HEAD:master
 deploy:
   provider: script
   skip_cleanup: true

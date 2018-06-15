@@ -77,7 +77,7 @@ describe('href handling', () => {
 
   it('hash-fragment only', () => {
     hijack.shouldRouterHandle('#anchor', e)
-    expect(push).not.toHaveBeenCalled()
+    expect(push).toHaveBeenCalledWith('#anchor')
   })
 
   it('non-http protocol', () => {

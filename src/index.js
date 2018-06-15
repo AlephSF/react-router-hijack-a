@@ -3,6 +3,12 @@ import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 
 export class Hijack extends Component {
+  constructor (props) {
+    super(props)
+    const { protocols = [] } = props
+    this.protocols = protocols.concat([ 'mailto', 'tel' ])
+  }
+
   getLocation (href) {
     // eslint-disable-next-line no-useless-escape
     const re = /^(https?\:)?\/\/(([^:\/?#]*)(?:\:([0-9]+))?)([\/]{0,1}[^?#]*)(\?[^#]*|)(#.*|)$/
@@ -21,12 +27,12 @@ export class Hijack extends Component {
   }
 
   shouldRouterHandle (url, event) {
-    // if the href is a query string, we handle it with react router
-    if (url[0] === '?') {
-      this.props.history.push(url)
-      event.preventDefault()
-      return
-    }
+    // if it is an explicit non-http protocol, we want the browser to handle it natively
+    // using history.push will do bad things
+    const nonHttpProtocol = this.protocols.some(protocol => url.startsWith(`${protocol}:`))
+    if (nonHttpProtocol) { return }
+
+    let destination = url
 
     // if it's http or protocol-relative, we need to check further
     // we want to use react router if it's sending us to the same domain
@@ -35,16 +41,19 @@ export class Hijack extends Component {
     if (isHTTP) {
       const { hostname, pathname, search, hash } = this.getLocation(url)
       if (window.location.hostname === hostname) {
-        let destination = pathname
+        destination = pathname
         if (search) { destination += search }
         if (hash) { destination += hash }
-        this.props.history.push(destination)
-        event.preventDefault()
+      } else {
+        // if it's an external http url, we let the browser handle it natively
+        return
       }
     }
 
-    // in all other cases (non-http protocol, hash fragment, external http url)
-    // we let the browser handle it natively
+    // in all other cases (query string, hash fragment, relative URL)
+    // we directly push the url and React Router will handle it correctly
+    this.props.history.push(destination)
+    event.preventDefault()
   }
 
   onClick = event => {
@@ -76,7 +85,8 @@ export class Hijack extends Component {
 
 Hijack.propTypes = {
   children: PropTypes.node,
-  history: PropTypes.object.isRequired
+  history: PropTypes.object.isRequired,
+  protocols: PropTypes.arrayOf(PropTypes.string)
 }
 
 export default withRouter(Hijack)

@@ -1,0 +1,22 @@
+sudo: required
+language: node_js
+node_js:
+- '8'
+branches:
+  only:
+  - master
+before_install:
+- openssl aes-256-cbc -K $encrypted_4e722ade8bf0_key -iv $encrypted_4e722ade8bf0_iv
+  -in creds.enc -out creds -d
+- source creds
+install:
+- yarn install --production=false
+script:
+- yarn lint
+- yarn test
+- yarn build
+deploy:
+  provider: script
+  skip_cleanup: true
+  script:
+    - yarn release

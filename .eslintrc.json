@@ -1,0 +1,3 @@
+{
+    "extends": "@aleph/eslint-config"
+}

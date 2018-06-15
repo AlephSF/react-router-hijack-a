@@ -1,0 +1,48 @@
+{
+  "env": {
+  	"test": {
+      "presets": [
+        "env",
+        "react",
+        "minify"
+      ],
+      "plugins": [
+        "transform-runtime",
+        "transform-class-properties",
+        "transform-es2015-modules-commonjs",
+        "transform-object-rest-spread"
+      ]
+  	},
+    "production": {
+      "presets": [
+        [ "env", { "modules": false } ],
+        "react",
+        "minify"
+      ],
+      "plugins": [
+        "transform-runtime",
+        "transform-class-properties",
+        "transform-es2015-modules-commonjs",
+        "transform-object-rest-spread"
+      ],
+      "ignore": [
+        "*.test.js"
+      ],
+    },
+    "development": {
+      "presets": [
+        [ "env", { "modules": false } ],
+        "react"
+      ],
+      "plugins": [
+        "transform-runtime",
+        "transform-class-properties",
+        "transform-es2015-modules-commonjs",
+        "transform-object-rest-spread"
+      ],
+      "ignore": [
+        "*.test.js"
+      ],
+    }
+  }
+}

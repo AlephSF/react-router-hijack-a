@@ -80,7 +80,37 @@ describe('href handling', () => {
     expect(push).toHaveBeenCalledWith('#anchor')
   })
 
-  it('non-http protocol', () => {
+  it('expected non-http protocol', () => {
+    hijack.shouldRouterHandle('mailto:test@gmail.com', e)
+    expect(push).not.toHaveBeenCalled()
+  })
+
+  it('unexpected non-http protocol', () => {
+    hijack.shouldRouterHandle('test://example', e)
+    expect(push).toHaveBeenCalled()
+  })
+})
+
+describe('protocol prop handling', () => {
+  let hijack
+  let push
+  const e = { preventDefault: jest.fn() }
+
+  beforeEach(() => {
+    push = jest.fn()
+    hijack = shallow(
+      <Hijack protocols={[ 'test' ]} history={{ push }}>
+        <div className='tester' />
+      </Hijack>
+    ).instance()
+  })
+
+  it('custom protocol', () => {
+    hijack.shouldRouterHandle('test://example', e)
+    expect(push).not.toHaveBeenCalled()
+  })
+
+  it('mailto', () => {
     hijack.shouldRouterHandle('mailto:test@gmail.com', e)
     expect(push).not.toHaveBeenCalled()
   })

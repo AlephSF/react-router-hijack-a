@@ -4,7 +4,7 @@
   "description": "Watches HTML <a>-tag clicks and passes them to React Router if needed",
   "repository": {
     "type": "git",
-    "url": "https://github.com/AlephSF/react-router-hijack-a"
+    "url": "https://github.com/AlephSF/react-router-hijack-a.git"
   },
   "author": "Aleph Incorporated",
   "license": "MIT",

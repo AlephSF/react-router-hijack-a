@@ -3,12 +3,6 @@ import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 
 export class Hijack extends Component {
-  constructor (props) {
-    super(props)
-    const { protocols = [] } = props
-    this.protocols = protocols.concat([ 'mailto', 'tel' ])
-  }
-
   getLocation (href) {
     // eslint-disable-next-line no-useless-escape
     const re = /^(https?\:)?\/\/(([^:\/?#]*)(?:\:([0-9]+))?)([\/]{0,1}[^?#]*)(\?[^#]*|)(#.*|)$/
@@ -29,7 +23,8 @@ export class Hijack extends Component {
   shouldRouterHandle (url, event) {
     // if it is an explicit non-http protocol, we want the browser to handle it natively
     // using history.push will do bad things
-    const nonHttpProtocol = this.protocols.some(protocol => url.startsWith(`${protocol}:`))
+    const { protocols, hostnames } = this.props
+    const nonHttpProtocol = protocols.some(protocol => url.startsWith(`${protocol}:`))
     if (nonHttpProtocol) { return }
 
     let destination = url
@@ -40,7 +35,8 @@ export class Hijack extends Component {
     const isHTTP = re.test(url)
     if (isHTTP) {
       const { hostname, pathname, search, hash } = this.getLocation(url)
-      if (window.location.hostname === hostname) {
+      const sameSite = hostname === window.location.hostname || hostnames.indexOf(hostname) !== -1
+      if (sameSite) {
         destination = pathname
         if (search) { destination += search }
         if (hash) { destination += hash }
@@ -83,10 +79,16 @@ export class Hijack extends Component {
   }
 }
 
+Hijack.defaultProps = {
+  protocols: [ 'mailto', 'tel' ],
+  hostnames: []
+}
+
 Hijack.propTypes = {
-  children: PropTypes.node,
+  children: PropTypes.node.isRequired,
   history: PropTypes.object.isRequired,
-  protocols: PropTypes.arrayOf(PropTypes.string)
+  protocols: PropTypes.arrayOf(PropTypes.string).isRequired,
+  hostnames: PropTypes.arrayOf(PropTypes.string).isRequired
 }
 
 export default withRouter(Hijack)

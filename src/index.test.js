@@ -3,6 +3,8 @@ import React from 'react'
 import { shallow, mount } from 'enzyme'
 import { Hijack } from './index'
 
+const e = { preventDefault: jest.fn() }
+
 describe('basic rendering', () => {
   it('should render children when passed in', () => {
     const wrapper = shallow(
@@ -34,7 +36,6 @@ describe('using <a> tags as wrappers', () => {
 describe('href handling', () => {
   let hijack
   let push
-  const e = { preventDefault: jest.fn() }
 
   beforeEach(() => {
     push = jest.fn()
@@ -92,26 +93,40 @@ describe('href handling', () => {
 })
 
 describe('protocol prop handling', () => {
-  let hijack
-  let push
-  const e = { preventDefault: jest.fn() }
+  it('default protocol', () => {
+    const push = jest.fn()
+    const hijack = shallow(
+      <Hijack history={{ push }}>
+        <div className='tester' />
+      </Hijack>
+    ).instance()
+    hijack.shouldRouterHandle('mailto:test@gmail.com', e)
+    expect(push).not.toHaveBeenCalled()
+  })
 
-  beforeEach(() => {
-    push = jest.fn()
-    hijack = shallow(
+  it('custom protocol overrides defaults', () => {
+    const push = jest.fn()
+    const hijack = shallow(
       <Hijack protocols={[ 'test' ]} history={{ push }}>
         <div className='tester' />
       </Hijack>
     ).instance()
-  })
-
-  it('custom protocol', () => {
     hijack.shouldRouterHandle('test://example', e)
     expect(push).not.toHaveBeenCalled()
-  })
-
-  it('mailto', () => {
     hijack.shouldRouterHandle('mailto:test@gmail.com', e)
-    expect(push).not.toHaveBeenCalled()
+    expect(push).toHaveBeenCalledWith('mailto:test@gmail.com')
+  })
+})
+
+describe('hostname prop handling', () => {
+  it('approves of listed hostnames', () => {
+    const push = jest.fn()
+    const hijack = shallow(
+      <Hijack hostnames={[ 'www.test.com', 'test.com' ]} history={{ push }}>
+        <div className='tester' />
+      </Hijack>
+    ).instance()
+    hijack.shouldRouterHandle('https://test.com/page', e)
+    expect(push).toHaveBeenCalledWith('/page')
   })
 })

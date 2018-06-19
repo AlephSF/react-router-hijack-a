@@ -34,3 +34,19 @@ import Hijack from '@aleph/react-router-hijack-a'
   ` }} />
 </Hijack>
 ```
+
+The component accepts a `hostnames` prop, which is a list of hostnames that
+should be interchangeable when referring to your app. If your site is available
+at a single hostname, there is no need to use this prop. Most often, it should
+be used to account for the `www` subdomain and bare domain being interchangeable:
+
+```jsx
+import Hijack from '@aleph/react-router-hijack-a'
+
+<Hijack hostnames={[ 'test.com', 'www.test.com' ]}>
+  <div dangerouslySetInnerHTML={{ __html: `
+    <a href='https://test.com/home'>homepage</a>
+    <a href='https://www.test.com/home'>homepage</a>
+  ` }} />
+</Hijack>
+```

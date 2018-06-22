@@ -130,3 +130,35 @@ describe('hostname prop handling', () => {
     expect(push).toHaveBeenCalledWith('/page')
   })
 })
+
+describe('target attribute handling', () => {
+  let hijack
+  let shouldRouterHandle
+
+  beforeEach(() => {
+    hijack = mount(
+      <Hijack history={jest.mock()}>
+        <a id='one' href='/internal'>link</a>
+        <a id='two' href='/internal' target='_blank'>link</a>
+        <a id='three' href='/internal' target='_self'>link</a>
+      </Hijack>
+    )
+    shouldRouterHandle = jest.fn()
+    hijack.instance().shouldRouterHandle = shouldRouterHandle
+  })
+
+  it('no target', () => {
+    hijack.find('#one').simulate('click')
+    expect(shouldRouterHandle).toHaveBeenCalled()
+  })
+
+  it('target: _blank', () => {
+    hijack.find('#two').simulate('click')
+    expect(shouldRouterHandle).not.toHaveBeenCalled()
+  })
+
+  it('target: _self', () => {
+    hijack.find('#three').simulate('click')
+    expect(shouldRouterHandle).toHaveBeenCalled()
+  })
+})

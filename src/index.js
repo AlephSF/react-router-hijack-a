@@ -65,6 +65,8 @@ export class Hijack extends Component {
     const self = event.currentTarget
     for (let el = event.target; el !== self; el = el.parentElement) {
       if (el.nodeName === 'A') {
+        const target = el.getAttribute('target')
+        if (target && target !== '_self' && target !== window.name) { return }
         const href = el.getAttribute('href')
         href && this.shouldRouterHandle(href, event)
         break
